@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>INFINITY EMPIRE — NEON DYNASTY</title>
+<meta name="theme-color" content="#080b1d"><meta name="description" content="Build, boost, and ascend in Infinity Empire — a futuristic idle civilization game.">
+<script src="https://www.youtube.com/game_api/v1"></script>
+<style>
+:root{--bg:#0a0d24;--p:#161b3e;--p2:#232a5c;--acc:#35e0ff;--vio:#9b6bff;--gold:#ffc94a;--good:#4be38c;--bad:#ff6b7a;--tx:#f4f7ff;--sub:#a9b6e8;--mut:#4a5288;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font:600 14px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;touch-action:manipulation}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+#hud{position:fixed;top:0;left:0;right:0;padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left));pointer-events:none}
+.c0{max-width:380px;margin:0 auto;background:linear-gradient(180deg,#1b2150ee,#10143aee);border:2px solid var(--p2);border-radius:16px;padding:8px 10px;pointer-events:auto;box-shadow:0 0 18px #35e0ff22}
+.r{display:flex;align-items:center;gap:8px}.coin{width:18px;height:18px;border-radius:50%;background:radial-gradient(#fff3b0,var(--gold));box-shadow:0 0 8px var(--gold)}
+#cr{margin-left:auto;font-size:25px;color:var(--gold);font-weight:800}#ps{font-size:11px;color:var(--sub)}
+#bar{position:relative;flex:1;height:24px;border-radius:12px;background:#0b0f2c;overflow:hidden;border:1px solid var(--p2)}
+#fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,#1b9bff,var(--acc));transition:width .12s}
+#et{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;text-shadow:0 1px 2px #000}
+.ib{width:34px;height:34px;border-radius:10px;background:var(--p2);font-size:15px}
+#obj{max-width:380px;margin:6px auto 0;display:flex;gap:6px;align-items:center;justify-content:center;text-align:center;font-size:12.5px;background:#10143acc;border:1px solid var(--p2);border-radius:10px;padding:6px 10px;pointer-events:auto}
+#obj button{background:none;color:var(--sub);font-size:16px;padding:0 4px}
+#toasts{position:fixed;top:calc(158px + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
+.t{background:var(--p);border:2px solid var(--acc);border-radius:10px;padding:5px 12px;font-size:12.5px;animation:f 2.8s forwards}.t.good{border-color:var(--good)}.t.bad{border-color:var(--bad)}.t.gold{border-color:var(--gold)}
+@keyframes f{0%,80%{opacity:1}100%{opacity:0}}
+#panel{position:fixed;left:0;right:0;bottom:0;height:44vh;display:flex;flex-direction:column;padding:8px calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));background:linear-gradient(180deg,#161b3ef2,#0d1030f8);border-top:2px solid var(--p2);border-radius:18px 18px 0 0}
+#sell{height:46px;border-radius:12px;background:linear-gradient(180deg,#5cf0a0,#2cc576);color:#06281a;font-size:16px;font-weight:800;flex:none}#sell:disabled{background:var(--mut);color:var(--sub)}
+#tabs{display:flex;gap:6px;margin:8px 0;flex:none}#tabs button{flex:1;height:34px;border-radius:9px;background:var(--p2);color:var(--sub);font-weight:700}#tabs button.on{background:var(--vio);color:#fff}
+#list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.u{display:flex;align-items:center;gap:8px;background:var(--p2);border-radius:12px;padding:7px 8px 7px 10px;min-height:56px;flex:none}.u.h{display:none}
+.u .i{flex:1;min-width:0}.u b{display:block;font-size:13.5px}.u small{display:block;color:var(--sub);font-size:11px;font-weight:600;margin-top:2px}
+.bt{min-width:92px;min-height:42px;border-radius:10px;background:var(--mut);color:var(--sub);font-weight:800;font-size:13px;padding:4px 8px}.bt.ok{background:linear-gradient(180deg,var(--gold),#e69a1e);color:#2b1a00}.bt.pulse{animation:p 1s infinite}
+@keyframes p{50%{box-shadow:0 0 14px var(--gold)}}
+.u.done{opacity:.6}
+#modal{position:fixed;inset:0;background:#05071cd9;display:none;align-items:center;justify-content:center;z-index:8;padding:16px}#modal.on{display:flex}
+#mb{background:var(--p);border:2px solid var(--vio);border-radius:18px;padding:18px;max-width:340px;width:100%;text-align:center;line-height:1.45}
+#mb h2{margin:0 0 8px;color:var(--acc)}#mb p{margin:6px 0;color:var(--sub)}#mb button{display:block;width:100%;min-height:44px;margin-top:8px;border-radius:11px;background:var(--p2);font-weight:800}#mb button.pri{background:linear-gradient(180deg,var(--vio),#6a3fe0)}
+#load{position:fixed;inset:0;background:radial-gradient(circle at 50% 40%,#2a1a6e,#0a0d24 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:9}
+#load h1{margin:0;font-size:30px;letter-spacing:3px;color:var(--acc);text-shadow:0 0 20px var(--acc)}.lb{width:200px;height:8px;border-radius:4px;background:var(--p2);overflow:hidden}.lb i{display:block;height:100%;width:40%;background:var(--acc);animation:l 1s infinite alternate}@keyframes l{to{margin-left:60%}}
+@media (min-aspect-ratio:1/1){#panel{left:auto;top:0;height:auto;width:min(360px,46vw);border-radius:18px 0 0 18px;border-top:0;border-left:2px solid var(--p2)}#hud,#toasts{right:min(360px,46vw)}}
+@media (prefers-reduced-motion:reduce){.bt.pulse,.t{animation:none}}
+
+/* NEON DYNASTY — responsive, tactile visual upgrade */
+:root{--bg:#070b1c;--p:#111a34;--p2:#1b2c51;--acc:#52eaff;--vio:#9575ff;--gold:#ffd575;--sub:#b7c7eb;--mut:#344567}
+body{background:radial-gradient(ellipse at 32% 38%,#16224c,#070b1c 78%);letter-spacing:.012em}
+button{transition:filter .15s ease,transform .12s ease,background .15s ease;touch-action:manipulation}
+button:active:not(:disabled){transform:scale(.96);filter:brightness(1.15)}button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.c0{max-width:420px;padding:10px 12px;border:1px solid #5171bb99;background:linear-gradient(145deg,#1a294beF,#10142fea);box-shadow:0 14px 40px #0009,0 0 28px #35e0ff18;backdrop-filter:blur(14px)}
+#cr{font-variant-numeric:tabular-nums;font-size:27px;text-shadow:0 0 20px #ffc94a55}
+#ps{margin:4px 0 0;font-size:10.5px;line-height:1.5}
+#bar{height:28px;border:1px solid #345a86;background:#030a1f}
+#fill{background:linear-gradient(90deg,#1162d3,#42dfff,#a1faff);box-shadow:0 0 16px #35e0ff88}
+#obj{max-width:420px;background:#0c1936da;border:1px solid #587abd66;box-shadow:0 6px 20px #0006;min-height:34px}
+#panel{border-color:#496ba077;background:linear-gradient(175deg,#152342f9,#090f25fb);box-shadow:0 -18px 50px #0009;backdrop-filter:blur(18px)}
+#sell{background:linear-gradient(110deg,#44eea2,#91ffba,#28cda0);box-shadow:0 4px 18px #33e89a44;letter-spacing:.025em}
+#tabs{margin:9px 0}#tabs button{background:#1d3055;border:1px solid #4b649055;letter-spacing:.025em}#tabs button.on{background:linear-gradient(130deg,#7e5bf0,#487beb);border-color:#c4b2ff;box-shadow:0 3px 12px #8365ff55}
+.u{border:1px solid #5876a933;background:linear-gradient(135deg,#1a2b4e,#182442);padding:9px 10px;min-height:66px}
+.u b{font-size:13px}.u small{line-height:1.35;font-size:10.5px}
+.bt{border:1px solid #708ab444;min-width:100px}.bt.ok{background:linear-gradient(120deg,#ffe69a,#ffbd4a);border-color:#fff0bb;box-shadow:0 2px 10px #ffcf5555}
+#mb{max-height:85vh;overflow:auto;border:1px solid #8b81ee;background:linear-gradient(160deg,#192a50,#11162f);box-shadow:0 25px 90px #000c}
+#toasts{z-index:5}.t{background:#142447ee;box-shadow:0 6px 25px #0008}
+#brand{font-size:9px;font-weight:900;letter-spacing:.2em;color:#74e9ff;text-transform:uppercase;opacity:.9;margin-bottom:5px}
+#subhud{max-width:420px;margin:6px auto 0;display:flex;gap:6px;pointer-events:auto;align-items:stretch}
+#subhud button{background:#1c2c52e8;border:1px solid #5071ae;border-radius:10px;min-height:36px;padding:5px 10px;font-weight:800;font-size:11px;flex:1;box-shadow:0 4px 16px #0007}
+#subhud button.ready{color:#09152e;background:linear-gradient(110deg,#e9b2ff,#6beeff);border-color:#d3c1ff;animation:boostglow 1.8s ease-in-out infinite}
+#subhud button:disabled{opacity:.6;cursor:default}
+#combo{color:#ffd575;font-variant-numeric:tabular-nums;text-shadow:0 0 10px #ffca5099;min-width:90px;text-align:center;align-self:center;font-size:12px}
+@keyframes boostglow{50%{box-shadow:0 0 20px #aa74ff77}}
+#hint{position:fixed;left:0;bottom:calc(44vh + 10px);width:100%;text-align:center;pointer-events:none;color:#9aefff;font-size:11px;letter-spacing:.12em;font-weight:900;text-shadow:0 2px 12px #000,0 0 10px #24dbff;opacity:.75;animation:hintpulse 2.8s ease-in-out infinite}
+@keyframes hintpulse{50%{opacity:.35}}
+@media (min-aspect-ratio:1/1){#hint{width:calc(100% - min(360px,46vw));bottom:20px}#subhud{max-width:420px}}
+@media (max-height:600px) and (max-aspect-ratio:1/1){#panel{height:49vh}#hint{bottom:calc(49vh + 7px)}.c0{padding:6px 9px}#obj{min-height:27px;padding:3px 6px}#subhud{margin-top:3px}#subhud button{min-height:28px}#brand{margin-bottom:2px}}
+@media (prefers-reduced-motion:reduce){#hint,#subhud button.ready{animation:none}}
+
+/* NEO DYNASTY: responsive cybernetic command deck */
+#world3d{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;z-index:0}
+#c{position:fixed;inset:0;z-index:1;pointer-events:none}
+#hud{z-index:4}#panel{z-index:3}#toasts,#hint{z-index:4}#modal,#load{z-index:9}
+body{font-family:Inter,"Segoe UI",system-ui,sans-serif;background:#050b1d}
+.c0{border:1px solid #64d9ff65;border-radius:18px;background:linear-gradient(130deg,#091b36eF,#1c1640ee);box-shadow:0 13px 50px #000a,0 0 28px #39cafa23}
+#panel{border:1px solid #5c9bc75a;background:linear-gradient(150deg,#0c1b34f2,#0a0d20f8);border-radius:24px 24px 0 0}
+#tabs{padding:3px;border-radius:12px;background:#080f24;border:1px solid #4d759154}#tabs button{border:0;background:transparent;border-radius:9px}
+#tabs button.on{background:linear-gradient(120deg,#12385e,#5f3c9b);box-shadow:inset 0 0 0 1px #7accff80}
+.u{background:linear-gradient(110deg,#132b47,#141e38);border:1px solid #75b4ee2c;border-radius:14px;min-height:70px}
+.u:hover{border-color:#60cbff6b}.bt:disabled{opacity:.55}
+#sell{font-weight:900;letter-spacing:.06em;box-shadow:0 6px 24px #0dffa52c}
+#brand{letter-spacing:.18em}#load{background:radial-gradient(circle at center,#171b59,#050818 68%)}
+#load h1{font-size:clamp(26px,5vw,54px);color:#dffcff;letter-spacing:.17em;text-align:center}
+#hint{font-size:11px;letter-spacing:.2em;opacity:.75}
+@media(min-width:900px){#panel{top:14px;bottom:14px;right:14px;width:365px;border-radius:24px;padding:16px}#hud{right:390px}#hint{width:calc(100% - 390px)}#toasts{right:390px}}
+@media(max-width:899px) and (min-aspect-ratio:1/1){#panel{right:6px;left:auto;top:8px;bottom:8px;width:min(340px,44vw);border-radius:18px}#hud{right:min(350px,45vw)}#hint{width:calc(100% - min(350px,45vw))}}
+@media(max-aspect-ratio:1/1){#panel{height:42vh;min-height:235px}#hint{bottom:calc(42vh + 12px)}#list{scrollbar-width:thin}.c0{max-width:460px}#subhud{max-width:460px}}
+@media(max-width:420px){#hud{padding-left:7px;padding-right:7px}.c0{padding:8px 9px}#cr{font-size:23px}#panel{padding-left:7px;padding-right:7px}#tabs button{font-size:12px}.bt{min-width:88px}#subhud button{padding:4px 5px;font-size:10px}}
+
+/* LIVE OPS DECK */
+#command{position:fixed;z-index:5;left:14px;bottom:18px;width:min(340px,calc(100vw - 28px));display:flex;flex-direction:column;gap:9px;pointer-events:none}
+#command>*{pointer-events:auto}#eventbox{border:1px solid #55dfff83;background:linear-gradient(130deg,#061a33ef,#201443ef);padding:12px;border-radius:17px;box-shadow:0 10px 32px #0009,0 0 20px #3de9ff1a;backdrop-filter:blur(12px)}
+#eventbox .eyebrow{font-size:10px;color:#86eaff;letter-spacing:.16em;font-weight:900}#eventbox strong{display:block;font-size:16px;margin:4px 0}#eventbox p{font-size:12px;color:#bed0ef;margin:4px 0 9px;line-height:1.45}#eventbox button{background:linear-gradient(105deg,#38dcfc,#a16aff);color:#061025;font-weight:900;border-radius:10px;padding:10px 12px;width:100%}
+#questdeck{display:flex;align-items:center;gap:8px;background:#091b34ee;border:1px solid #5e8fcc88;border-radius:13px;padding:9px 10px;font-size:11px;box-shadow:0 5px 20px #0008}#questdeck .qd{flex:1}#questdeck b{display:block;font-size:12px;color:#eaf9ff}#questdeck small{color:#b5d1f4;display:block;margin-top:3px}#questdeck button{background:#263e66;border:1px solid #6598c8;border-radius:9px;padding:9px;color:white;font-weight:800}#questdeck button:disabled{opacity:.55}
+#riftArena{position:fixed;inset:0;z-index:8;background:#030a1aa8;display:none;pointer-events:auto}#riftArena.on{display:block}#arenaInfo{position:absolute;top:23%;left:50%;transform:translateX(-50%);min-width:230px;text-align:center;background:#081d36ec;padding:12px 18px;border:1px solid #70e9ff;border-radius:16px;font-weight:900;text-shadow:0 1px 8px #000}#arenaInfo small{display:block;color:#a5daef;margin-top:5px;font-weight:600}#riftTarget{position:absolute;width:68px;height:68px;border-radius:50%;border:4px solid #b4f8ff;background:radial-gradient(circle,#fff 0%,#65ecfc 22%,#4452e6 54%,#17244c 70%);box-shadow:0 0 34px #3beeff,0 0 65px #ad78ff;animation:riftPulse .7s infinite alternate;touch-action:manipulation}#riftTarget:after{content:'✦';font-size:30px;color:white;text-shadow:0 0 12px white}@keyframes riftPulse{to{transform:scale(1.14);filter:hue-rotate(35deg)}}
+#arenaExit{position:absolute;right:15px;top:calc(15px + env(safe-area-inset-top));padding:10px 14px;border-radius:10px;background:#344565;color:white}
+#milestone{position:fixed;z-index:7;top:38%;left:50%;transform:translate(-50%,-50%);padding:18px 28px;text-align:center;background:#091932f2;border:1px solid #ffe3a0;border-radius:19px;box-shadow:0 0 70px #7b68ff88;display:none;pointer-events:none;font-weight:900;font-size:24px;max-width:90vw}#milestone small{display:block;color:#fbe2b6;font-size:12px;letter-spacing:.2em;margin-bottom:6px}
+@media (min-width:900px){#command{left:20px;bottom:20px}}@media(max-aspect-ratio:1/1){#command{bottom:calc(42vh + 14px);width:min(310px,calc(100vw - 20px));left:10px}#eventbox{padding:8px 10px}#eventbox strong{font-size:13px;margin:1px 0}#eventbox p{font-size:10px;margin:2px 0 6px}#eventbox button{padding:7px}#questdeck{padding:6px}#questdeck small{font-size:10px}}@media(max-height:680px){#command{max-width:250px}#questdeck{display:none}}@media(prefers-reduced-motion:reduce){#riftTarget{animation:none}}
+</style></head><body>
+<canvas id="world3d" aria-label="Interactive 3D empire, drag to orbit, tap to collect energy"></canvas><canvas id="c"></canvas>
+<div id="hud"><div class="c0"><div id="brand">✦ INFINITY EMPIRE <span style="color:#d5b5ff">/ NEON DYNASTY</span></div><div class="r"><span class="coin"></span>Credits<span id="cr">0</span></div><div id="ps"></div>
+<div class="r" style="margin-top:6px"><div id="bar"><i id="fill"></i><span id="et"></span></div><button class="ib" id="snd" aria-label="Sound">♪</button><button class="ib" id="gear" aria-label="Settings">⚙</button></div></div>
+<div id="subhud"><button id="boost" aria-label="Activate reactor overdrive">⚡ OVERDRIVE</button><button id="auto" aria-label="Toggle auto sell">◉ AUTO SELL</button><span id="combo">COMBO ×1</span></div>
+<div id="obj"><span id="ot"></span><button id="ox" aria-label="Dismiss tutorial">×</button></div></div>
+<div id="toasts"></div><div id="hint">✦ TAP THE REACTOR ✦</div>
+<div id="command"><div id="eventbox"><div class="eyebrow" id="evtTag">⚡ COMMAND SIGNAL</div><strong id="evtTitle">Rift energy detected</strong><p id="evtDesc">Intercept unstable energy for a burst of resources.</p><button id="evtButton">INTERCEPT RIFT</button></div><div id="questdeck"><div class="qd"><b id="qdTitle">FIELD CONTRACT</b><small id="qdText">Gather energy and earn a bonus.</small></div><button id="qdClaim">CLAIM</button></div></div><div id="riftArena"><div id="arenaInfo">RIFT INTERCEPT <span id="arenaCount">0 / 6</span><small id="arenaTimer">10 seconds</small></div><button id="arenaExit">EXIT</button><button id="riftTarget" aria-label="Collect rift shard">✦</button></div><div id="milestone"><small>EMPIRE MILESTONE</small><span id="milestoneText"></span></div>
+<div id="panel"><button id="sell"></button><div id="tabs"><button class="on">Build</button><button>Upgrades</button><button>Empire</button></div><div id="list"></div></div>
+<div id="modal"><div id="mb"></div></div>
+<div id="load"><h1>INFINITY EMPIRE</h1><div class="lb"><i></i></div><div>Booting reactor…</div></div>
+<script src="renderer3d.js"></script>
+<script>
+(()=>{"use strict";
+const YT=typeof ytgame!=="undefined"&&!!ytgame.IN_PLAYABLES_ENV,$=id=>document.getElementById(id),KEY="infinityEmpire_v1",VER=2;
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* ---------- data ---------- */
+const BK=["ext","dep","ref","gen","lab","mega"];
+const B={
+ ext:{n:"Energy Extractor",c:40,g:1.55,max:25,col:"#35e0ff",s:[-1,1],u:"Energy/s",v:l=>2*l,lock:"",ok:()=>1},
+ dep:{n:"Storage Depot",c:105,g:1.6,max:20,col:"#4b8bff",s:[1,1],u:"extra capacity",v:l=>20*l,lock:"Build an Energy Extractor",ok:()=>S.b.ext>=1},
+ ref:{n:"Refinery",c:600,g:1.7,max:15,col:"#ff8a3d",s:[-2,-1],u:"% sell value",v:l=>15*l,lock:"Expand your empire (Empire tab)",ok:()=>S.exp>=1},
+ gen:{n:"Credit Generator",c:1500,g:1.65,max:20,col:"#ffc94a",s:[2,-1],u:"Credits/s",v:l=>4*l,lock:"Needs Refinery + Expansion 1",ok:()=>S.exp>=1&&S.b.ref>=1},
+ lab:{n:"Research Lab",c:4000,g:1.8,max:10,col:"#b784ff",s:[-3,1],u:"% all output",v:l=>10*l,lock:"Needs Expansion 2",ok:()=>S.exp>=2},
+ mega:{n:"Mega Core",c:25000,g:1,max:1,col:"#ff5ad6",s:[0,-3],u:"% all output + unlocks Ascend",v:l=>50*l,lock:"Needs Expansion 2 + Research Lab",ok:()=>S.exp>=2&&S.b.lab>=1}};
+const UP={collect:{n:"Stronger Collector",c:30,g:1.6,max:20,u:"Energy per tap",v:l=>5+2*l},
+ cap:{n:"Bigger Battery",c:40,g:1.55,max:25,u:"Capacity",v:l=>25+15*l},
+ rate:{n:"Overclock",c:80,g:1.7,max:20,u:"% machine output",v:l=>100+20*l,lock:"Build an Energy Extractor",ok:()=>S.b.ext>=1}};
+const EXP=[{c:320,need:"Storage Depot",ok:()=>S.b.dep>=1},{c:4800,need:"Credit Generator",ok:()=>S.b.gen>=1}];
+const ACH=[["g1","Gather 100 Energy",()=>S.gath>=100,20],["b1","Build an Extractor",()=>S.b.ext>=1,25],["g2","Gather 5K Energy",()=>S.gath>=5000,200],["e1","Expand your empire",()=>S.exp>=1,300],
+ ["c1","Earn 10K Credits",()=>S.tot>=1e4,500],["gen","Build a Credit Generator",()=>S.b.gen>=1,800],["mega","Build the Mega Core",()=>S.b.mega>=1,5000],["asc","Ascend once",()=>S.asc>=1,3000]];
+const QUEST=[
+ {id:"q1",n:"First Spark",d:"Collect 250 total Energy",ok:()=>S.gath>=250,reward:100},
+ {id:"q2",n:"Industrial Age",d:"Own 5 Energy Extractors",ok:()=>S.b.ext>=5,reward:450},
+ {id:"q3",n:"Golden Opportunity",d:"Earn 25,000 lifetime Credits",ok:()=>S.tot>=25000,reward:2500},
+ {id:"q4",n:"The Great Expansion",d:"Expand your platform twice",ok:()=>S.exp>=2,reward:6000},
+ {id:"q5",n:"Quantum Architect",d:"Build a Mega Core",ok:()=>S.b.mega>=1,reward:20000},
+ {id:"q6",n:"Beyond Infinity",d:"Ascend for the first time",ok:()=>S.asc>=1,reward:15000}
+];
+const fresh=()=>({boostUntil:0,boostReady:0,auto:false,missions:{},v:VER,cr:0,en:0,run:0,tot:0,gath:0,core:0,asc:0,exp:0,b:{ext:0,dep:0,ref:0,gen:0,lab:0,mega:0},up:{collect:0,cap:0,rate:0},ach:{},o:{snd:true,fx:true,quality:"high",music:false},tut:0,ts:0,ops:{completed:0,lastRift:0,nextRift:0,contract:0,contractBase:0,claimed:0,feverUntil:0,choiceUntil:0,choiceType:""}});
+let S=fresh();
+const fmt=n=>{n=Math.floor(n+1e-9);if(n<1000)return""+n;const s=["","K","M","B","T"];let i=0;while(n>=1000&&i<4){n/=1000;i++}return(Math.floor(n*10)/10+"").replace(/\.0$/,"")+s[i]};
+const f1=n=>n<10?(Math.round(n*10)/10+""):fmt(n);
+const cost=(d,l)=>Math.round(d.c*Math.pow(d.g,l));
+function calc(){const boost=(Date.now()<S.boostUntil?2:1)*(Date.now()<S.ops.feverUntil?2:1);const core=1+.25*S.core,mg=S.b.mega?1.5:1,all=core*mg*(1+.1*S.b.lab)*boost;
+ return{cap:45+20*S.up.cap+25*S.b.dep,tap:Math.max(1,Math.round((7+3*S.up.collect)*core*mg*boost)),eps:2*S.b.ext*(1+.2*S.up.rate)*all,cps:4*S.b.gen*all,sell:(1+.15*S.b.ref)*core*mg}}
+/* ---------- persistence ---------- */
+let canSave=false,dirty=false,saveAt=0,lastSave=0,offlineMsg="";
+const nm=v=>typeof v==="number"&&isFinite(v)&&v>=0&&v<=1e15;
+function merge(d){if(!d||typeof d!=="object")return;const n=fresh();
+ for(const k of["cr","en","run","tot","gath","core","asc"])if(nm(d[k]))n[k]=d[k];
+ if(nm(d.exp))n.exp=Math.min(2,Math.floor(d.exp));if(nm(d.tut))n.tut=Math.min(2,Math.floor(d.tut));
+ if(d.v>=2&&d.b)for(const k of BK)if(nm(d.b[k]))n.b[k]=Math.min(Math.floor(d.b[k]),B[k].max);
+ if(d.v>=2&&d.up)for(const k in UP)if(nm(d.up[k]))n.up[k]=Math.min(Math.floor(d.up[k]),UP[k].max);
+ if(!(d.v>=2)){/* v1 migration */if(d.machine===true)n.b.ext=1;if(d.lv)for(const k in UP)if(nm(d.lv[k]))n.up[k]=Math.min(Math.floor(d.lv[k]),UP[k].max);n.gath=nm(d.gathered)?d.gathered:0;n.cr=n.tot=n.run=nm(d.credits)?d.credits:0;if(nm(d.energy))n.en=Math.floor(d.energy);n.tut=2}
+ if(d.ach&&typeof d.ach==="object")for(const a of ACH)if(d.ach[a[0]]===true)n.ach[a[0]]=true;
+ if(d.o&&typeof d.o==="object"){n.o.snd=d.o.snd!==false;n.o.fx=d.o.fx!==false;n.o.quality=["low","medium","high"].includes(d.o.quality)?d.o.quality:"high";n.o.music=d.o.music!==false}
+ if(d.ops&&typeof d.ops==='object'){for(const k of ['completed','lastRift','nextRift','contract','contractBase','claimed','feverUntil','choiceUntil'])if(nm(d.ops[k]))n.ops[k]=d.ops[k];if(typeof d.ops.choiceType==='string')n.ops.choiceType=d.ops.choiceType.slice(0,24)}
+ if(nm(d.ts))n.ts=d.ts;
+  if(nm(d.boostUntil))n.boostUntil=d.boostUntil;
+  if(nm(d.boostReady))n.boostReady=d.boostReady;
+  n.auto=d.auto===true;
+  if(d.missions&&typeof d.missions==="object")for(const q of QUEST)if(d.missions[q.id]===true)n.missions[q.id]=true;
+  S=n;S.en=Math.min(Math.floor(S.en),calc().cap)}
+function offline(){if(!S.ts)return;const sec=Math.min(Math.max((Date.now()-S.ts)/1000,0),7200);if(sec<60)return;const c=calc(),k=.25;
+ const e=Math.min(c.eps*sec*k,c.cap-S.en),g=c.cps*sec*k;if(e>=1||g>=1){S.en+=Math.floor(e);S.cr+=g;S.run+=g;S.tot+=g;offlineMsg="Welcome back! +"+fmt(e)+" Energy, +"+fmt(g)+" Credits"}}
+async function load(){try{const raw=YT?await ytgame.game.loadData():localStorage.getItem(KEY);if(raw)merge(JSON.parse(raw));canSave=true;offline()}catch(e){canSave=!YT}}
+function save(){if(!canSave)return;dirty=false;lastSave=performance.now();S.ts=Date.now();const s=JSON.stringify(S);
+ try{if(YT)Promise.resolve(ytgame.game.saveData(s)).catch(()=>{dirty=true});else localStorage.setItem(KEY,s)}catch(e){dirty=true}}
+function queue(){dirty=true;saveAt=performance.now()+1500}
+/* ---------- actions ---------- */
+function toast(t,k){const e=document.createElement("div");e.className="t "+(k||"");e.textContent=t;e.onanimationend=()=>e.remove();const b=$("toasts");b.appendChild(e);while(b.children.length>3)b.firstChild.remove()}
+let AC=null,audioOn=true,combo=0,lastTapAt=0,autoTimer=0;
+function snd(k){if(!S.o.snd||!audioOn)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const T={tap:[[520,.05]],sell:[[660,.06],[880,.08]],buy:[[523,.07],[784,.07],[1047,.1]],err:[[160,.12]],ach:[[784,.08],[988,.08],[1319,.14]]}[k];let t=AC.currentTime;for(const[f,d]of T){const o=AC.createOscillator(),g=AC.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.8}}catch(e){}}
+const earn=n=>{S.cr+=n;S.run+=n;S.tot+=n};
+function addEn(n){const a=Math.min(Math.floor(n),calc().cap-S.en);if(a>0){S.en+=a;S.gath+=a}return Math.max(a,0)}
+const fl=[],ps=[];let shake=0,pulse=0;
+function spawn(x,y,col,n){if(!S.o.fx||RM)return;for(let i=0;i<n&&ps.length<90;i++){const a=Math.random()*6.28,v=40+Math.random()*90;ps.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-40,l:1,c:col})}}
+function tap(x,y){const now=performance.now();combo=now-lastTapAt<1100?Math.min(20,combo+1):1;lastTapAt=now;const mult=1+Math.floor(combo/5)*.25;const a=addEn(calc().tap*mult);pulse=1;if(a>0){fl.push({x,y,t:0,s:"+"+a,c:"#8ff"});spawn(x,y,"#35e0ff",5);snd("tap")}else{fl.push({x,y,t:0,s:"FULL",c:"#ffc94a"});toast("Storage full – tap SELL!","bad");snd("err")}queue();trackContract();refresh()}
+function sell(){if(S.en<=0)return;const e=S.en,g=e*calc().sell;S.en=0;earn(g);toast("Sold "+fmt(e)+" Energy → "+fmt(g)+" Credits","good");fl.push({x:G.cx,y:G.cy-G.a*2,t:0,s:"+"+fmt(g),c:"#ffc94a"});spawn(G.cx,G.cy-G.a,"#ffc94a",10);snd("sell");queue();trackContract();refresh()}
+function ok(n,msg){if(S.cr<n){toast(msg||"Need "+fmt(n)+" Credits","bad");snd("err");return false}S.cr-=n;return true}
+function useBoost(){const now=Date.now();if(S.b.ext<3){toast("Build 3 Extractors to unlock Overdrive","bad");return}if(now<S.boostReady)return;
+ S.boostUntil=now+45000;S.boostReady=now+180000;toast("⚡ OVERDRIVE: 2× production for 45 seconds!","gold");snd("ach");spawn(G.cx,G.cy,"#ffd575",26);queue();refresh()}
+function claimQuest(id){const q=QUEST.find(x=>x.id===id);if(!q||S.missions[id]||!q.ok())return;S.missions[id]=true;earn(q.reward);toast("MISSION COMPLETE! +"+fmt(q.reward)+" Credits","gold");snd("ach");queue();refresh()}
+function bought(m){toast(m,"good");snd("buy");shake=RM?0:.25;spawn(G.cx,G.cy,"#b784ff",16);queue();refresh()}
+function buyB(k){const d=B[k],l=S.b[k];if(!d.ok()||l>=d.max)return false;if(!ok(cost(d,l)))return false;S.b[k]++;bought(d.n+" → level "+S.b[k]);trackContract();milestoneCheck();return true}
+function buyU(k){const d=UP[k],l=S.up[k];if((d.ok&&!d.ok())||l>=d.max)return false;if(!ok(cost(d,l)))return false;S.up[k]++;bought(d.n+" → level "+S.up[k]);return true}
+function buyX(){const x=EXP[S.exp];if(!x||!x.ok())return false;if(!ok(x.c))return false;S.exp++;bought("Empire expanded! New build area revealed.");milestoneCheck();return true}
+const gain=()=>S.b.mega?Math.floor(Math.sqrt(S.run/20000)):0;
+function ascend(){const g=gain();if(g<1)return false;S.core+=g;S.asc++;const k=S.core,a=S.asc,ach=S.ach,o=S.o,t=S.tut,tot=S.tot,ga=S.gath,missions=S.missions;const ops=S.ops;S=fresh();Object.assign(S,{core:k,asc:a,ach,o,tut:t,tot,gath:ga,missions,ops});toast("Ascended! +"+g+" Core(s): permanent +"+25*g+"% output","gold");snd("ach");shake=.5;queue();save();refresh();return true}
+/* ---------- tick (simulation only) ---------- */
+let acc=0;
+function step(dt){const c=calc();if(c.eps>0){if(S.en>=c.cap)acc=0;else{acc+=c.eps*dt;const w=Math.floor(acc);if(w>=1){addEn(w);acc-=w}}}if(c.cps>0)earn(c.cps*dt);
+ if(S.auto&&S.b.gen>=1&&S.en>0){autoTimer+=dt;if(autoTimer>=2&&S.en>=Math.min(c.cap,Math.max(10,c.eps*1.5))){const g=S.en*c.sell*.9;S.en=0;earn(g);autoTimer=0;queue()}}}
+function checkAch(){for(const a of ACH)if(!S.ach[a[0]]&&a[2]()){S.ach[a[0]]=true;earn(a[3]);toast("Achievement: "+a[1]+" (+"+fmt(a[3])+")","gold");snd("ach");queue()}}
+/* ---------- LIVE OPS: short skill encounters + rotating objectives ---------- */
+const contracts=[{name:'Reactor Specialist',metric:'gath',goal:100,label:'Gather {n} Energy'},{name:'Trade Route',metric:'tot',goal:175,label:'Earn {n} Credits'},{name:'Machine Architect',metric:'builds',goal:2,label:'Purchase {n} buildings'}];
+let arena=null,arenaClock=0,arenaHits=0,arenaAttempts=0,milestoneTimer=0,knownBuildings=0,knownExpansion=0;
+function buildsCount(){return BK.reduce((a,k)=>a+S.b[k],0)}
+function metric(k){return k==='builds'?buildsCount():S[k]}
+function contractObj(){return contracts[S.ops.contract%contracts.length]}
+function contractGoal(){return Math.round(contractObj().goal*(1+S.ops.claimed*.24))}
+function trackContract(){if(S.ops.contractBase===0)S.ops.contractBase=metric(contractObj().metric)}
+function renderOps(){const op=S.ops,now=Date.now(),c=contractObj();const v=Math.max(0,metric(c.metric)-op.contractBase),goal=contractGoal(),ready=v>=goal;
+ $('qdTitle').textContent='◆ '+c.name+' · '+Math.min(goal,Math.floor(v))+'/'+goal;
+ $('qdText').textContent=c.label.replace('{n}',fmt(goal))+' · +'+fmt(80*(1+op.claimed))+' Credits';$('qdClaim').disabled=!ready;$('qdClaim').textContent=ready?'CLAIM BONUS':'IN PROGRESS';
+ const wait=Math.max(0,Math.ceil((op.nextRift-now)/1000));$('evtTag').textContent=wait?'◈ NEXT RIFT IN '+wait+'s':'⚡ ANOMALY DETECTED';$('evtTitle').textContent=wait?'Prepare your intercept':'RIFT INTERCEPT READY';$('evtDesc').textContent=wait?'Upgrade your machines while the next energy rift forms.':'Hit six moving energy shards before the portal closes to earn a large credit reward.';$('evtButton').textContent=wait?'CHARGING · '+wait+'s':'⚡ INTERCEPT RIFT';$('evtButton').disabled=wait>0||!!arena;
+}
+function claimContract(){const c=contractObj(),op=S.ops;if(metric(c.metric)-op.contractBase<contractGoal())return;const reward=80*(1+op.claimed);earn(reward);op.claimed++;op.contract++;op.contractBase=metric(contractObj().metric);toast('CONTRACT COMPLETE! +'+fmt(reward)+' credits','gold');snd('ach');queue();renderOps();refresh()}
+function showMilestone(text){if(RM){toast(text,'gold');return}const el=$('milestone');$('milestoneText').textContent=text;el.style.display='block';clearTimeout(milestoneTimer);milestoneTimer=setTimeout(()=>el.style.display='none',2400);snd('ach')}
+function milestoneCheck(){let count=buildsCount();if(count>knownBuildings){if(count===1)showMilestone('FIRST MACHINE ONLINE');else if(count===5)showMilestone('INDUSTRIAL NETWORK');else if(count===12)showMilestone('NEON METROPOLIS');knownBuildings=count}if(S.exp>knownExpansion){knownExpansion=S.exp;showMilestone(S.exp===1?'NEW FRONTIER UNLOCKED':'EMPIRE ASCENDANT')}}
+function placeTarget(){let box=$('riftTarget'),w=innerWidth,h=innerHeight,portrait=w<h,usableW=portrait?w:w-Math.min(370,w*.44),top=Math.min(200,h*.28),bottom=portrait?Math.max(h*.43,220):h-30;box.style.left=Math.round(30+Math.random()*Math.max(15,usableW-110))+'px';box.style.top=Math.round(top+Math.random()*Math.max(15,bottom-top-90))+'px'}
+function startRift(){if(arena||Date.now()<S.ops.nextRift)return;arenaHits=0;arenaAttempts=0;arena={end:performance.now()+12500};$('riftArena').classList.add('on');$('arenaCount').textContent='0 / 6';placeTarget();snd('ach');renderOps()}
+function finishRift(){if(!arena)return;arena=null;$('riftArena').classList.remove('on');const hits=arenaHits,scale=1+S.ops.completed*.18;const reward=Math.round((40+hits*42+Math.max(0,hits-5)*130)*scale);earn(reward);if(hits===6){S.ops.feverUntil=Date.now()+22000;toast('PERFECT INTERCEPT! 2× production for 22 seconds','gold');showMilestone('PERFECT INTERCEPT')}else toast('Rift closed · +'+fmt(reward)+' Credits','good');S.ops.completed++;S.ops.lastRift=Date.now();S.ops.nextRift=Date.now()+28000;queue();refresh();renderOps()}
+function updateArena(now){if(!arena)return;let left=Math.max(0,(arena.end-now)/1000);$('arenaTimer').textContent=left.toFixed(1)+'s · '+arenaHits+' shards';if(left<=0)finishRift()}
+function initOps(){const op=S.ops;if(!op.nextRift)op.nextRift=Date.now()+8000;if(op.contractBase===0)op.contractBase=metric(contractObj().metric);knownBuildings=buildsCount();knownExpansion=S.exp;$('evtButton').onclick=startRift;$('qdClaim').onclick=claimContract;$('arenaExit').onclick=finishRift;$('riftTarget').onclick=e=>{e.preventDefault();if(!arena)return;arenaHits++;arenaAttempts++;$('arenaCount').textContent=arenaHits+' / 6';snd('tap');spawn(innerWidth*.5,innerHeight*.5,'#8ff',8);if(arenaHits>=6)finishRift();else placeTarget()};renderOps()}
+/* ---------- UI ---------- */
+const rows=[];let tab=0;
+function row(t,f){const e=document.createElement("div");e.className="u";e.innerHTML='<div class="i"><b></b><small></small></div><button class="bt"></button>';const r={t,e,f,b:e.children[0].children[0],s:e.children[0].children[1],bt:e.children[1]};$("list").appendChild(e);rows.push(r);return r}
+function setRow(r,name,desc,txt,st,act){r.b.textContent=name;r.s.textContent=desc;r.bt.textContent=txt;r.bt.className="bt"+(st==="ok"?" ok":"");r.bt.style.display=txt?"":"none";r.bt.onclick=act||null;r.e.classList.toggle("done",st==="done")}
+function build(){
+ for(const k of BK)row(0,()=>{const d=B[k],l=S.b[k],r=rows.find(x=>x.k===k);const u=d.ok();let s,tx,st;
+  if(!u){s="Locked: "+d.lock;tx="Locked"}else if(l>=d.max){s=d.u+": "+f1(d.v(l));tx="MAX";st="done"}else{s=d.u+": "+f1(d.v(l))+" → "+f1(d.v(l+1));tx=fmt(cost(d,l));st=S.cr>=cost(d,l)?"ok":""}
+  setRow(r,d.n+(l?" · Lv "+l:""),s,tx,st,()=>buyB(k));r.bt.classList.toggle("pulse",k==="ext"&&l===0&&st==="ok")}).k=k;
+ for(const k in UP)row(1,()=>{const d=UP[k],l=S.up[k],r=rows.find(x=>x.k===k);const u=!d.ok||d.ok();let s,tx,st;
+  if(!u){s="Locked: "+d.lock;tx="Locked"}else if(l>=d.max){s=d.u+": "+f1(d.v(l));tx="MAX";st="done"}else{s=d.u+": "+f1(d.v(l))+" → "+f1(d.v(l+1));tx=fmt(cost(d,l));st=S.cr>=cost(d,l)?"ok":""}
+  setRow(r,d.n+" · Lv "+l,s,tx,st,()=>buyU(k))}).k=k;
+ row(2,()=>{const r=rows.find(x=>x.k==="x"),x=EXP[S.exp];if(!x)setRow(r,"Empire fully expanded","All areas revealed","","done");else setRow(r,"Expand Empire ("+(S.exp+1)+"/2)",x.ok()?"Reveals a larger platform and new building slots":"Locked: needs "+x.need,x.ok()?fmt(x.c):"Locked",x.ok()&&S.cr>=x.c?"ok":"",buyX)}).k="x";
+ row(2,()=>{const r=rows.find(x=>x.k==="a"),g=gain();setRow(r,"Ascend ("+S.core+" Cores)",S.b.mega?"Reset run for +"+g+" Core(s): each Core = +25% output":"Locked: build the Mega Core first",S.b.mega?(g>=1?"Ascend":"Need more"):"Locked",g>=1?"ok":"",()=>g>=1?modal("Ascend?",["Resets credits, energy, buildings, upgrades and expansion.","Keeps Cores, achievements and settings.","You gain "+g+" Core(s): +"+25*g+"% permanent output."],[["Ascend now",()=>{ascend();modal()},1],["Cancel",()=>modal()]]):toast("Earn more this run to gain a Core.","bad"))}).k="a";
+ for(const q of QUEST)row(2,()=>{const r=rows.find(x=>x.k===q.id),done=!!S.missions[q.id],ready=q.ok();setRow(r,(done?"✓ ":"◆ ")+q.n,q.d+" · Reward "+fmt(q.reward),done?"CLAIMED":ready?"CLAIM +"+fmt(q.reward):"IN PROGRESS",done?"done":ready?"ok":"",()=>claimQuest(q.id))}).k=q.id;
+  for(const a of ACH)row(2,()=>{const r=rows.find(x=>x.k===a[0]);setRow(r,(S.ach[a[0]]?"✓ ":"")+a[1],"Reward: "+fmt(a[3])+" Credits",S.ach[a[0]]?"Done":"",S.ach[a[0]]?"done":"")}).k=a[0];
+ for(const r of rows)r.e.classList.toggle("h",r.t!==tab);
+ [...$("tabs").children].forEach((b,i)=>b.onclick=()=>{tab=i;[...$("tabs").children].forEach((x,j)=>x.classList.toggle("on",j===i));for(const r of rows)r.e.classList.toggle("h",r.t!==i);$("list").scrollTop=0;refresh()});
+ $("boost").onclick=useBoost;
+  $("auto").onclick=()=>{if(S.b.gen<1){toast("Build a Credit Generator to unlock Auto Sell","bad");return}S.auto=!S.auto;toast(S.auto?"Auto Sell enabled — sells at 90% value":"Auto Sell disabled");queue();refresh()};
+  $("sell").onclick=sell;$("ox").onclick=()=>{S.tut=2;queue();refresh()};$("gear").onclick=settings;$("snd").onclick=()=>{S.o.snd=!S.o.snd;queue();refresh()};}
+function objective(){
+ if(S.tut<2){if(S.gath<5)return"Tap the glowing crystal to gather Energy";if(S.tot<=0)return"Tap SELL to turn Energy into Credits";if(S.b.ext<1)return"Build the Energy Extractor (Build tab)";S.tut=2;queue()}
+ if(S.b.mega&&gain()>=1)return"Ascend (Empire tab) for +"+gain()+" Core(s) and permanent power!";
+ let best=null,bc=1/0;const c=(n,p)=>{if(p<bc){bc=p;best=n}};
+ for(const k of BK){const d=B[k];if(d.ok()&&S.b[k]<d.max)c(d.n,cost(d,S.b[k]))}for(const k in UP){const d=UP[k];if((!d.ok||d.ok())&&S.up[k]<d.max)c(d.n,cost(d,S.up[k]))}
+ const x=EXP[S.exp];if(x&&x.ok())c("Expand Empire",x.c);
+ return best?"Next goal: "+best+" – "+fmt(bc)+" Credits":"Maxed out – Ascend to keep growing!"}
+function refresh(){const c=calc();$("cr").textContent=fmt(S.cr);$("fill").style.width=(100*S.en/c.cap)+"%";$("fill").style.background=S.en>=c.cap?"linear-gradient(90deg,#ff9a3d,#ffc94a)":"";
+ $("et").textContent=S.en>=c.cap?"Energy FULL – sell it!":"Energy "+fmt(S.en)+" / "+fmt(c.cap);$("ps").textContent="+"+f1(c.eps)+" Energy/s · +"+f1(c.cps)+" Credits/s · Sell ×"+f1(c.sell)+(S.core?" · "+S.core+" Cores":"");
+ const now=Date.now(),boost=$("boost"),auto=$("auto");
+  const left=Math.max(0,Math.ceil((S.boostUntil-now)/1000)),cool=Math.max(0,Math.ceil((S.boostReady-now)/1000));
+  boost.textContent=left?"⚡ 2× BOOST · "+left+"s":S.b.ext<3?"⚡ BOOST · 3 EXTRACTORS":cool?"⚡ RECHARGE · "+cool+"s":"⚡ ACTIVATE 2× BOOST";
+  boost.classList.toggle("ready",S.b.ext>=3&&!cool&&!left);boost.disabled=left>0||cool>0||S.b.ext<3;
+  auto.textContent=S.b.gen<1?"◉ AUTO SELL · LOCKED":S.auto?"◉ AUTO SELL · ON":"◉ AUTO SELL · OFF";
+  auto.classList.toggle("ready",S.auto);$("combo").textContent="COMBO ×"+(1+Math.floor(combo/5)*.25).toFixed(2).replace(/\.00$/,'');
+  $("hint").textContent=S.en>=c.cap?"◆ BATTERY FULL — SELL ENERGY ◆":left?"⚡ OVERDRIVE ACTIVE ⚡":"✦ TAP THE REACTOR ✦";
+  const sb=$("sell");sb.disabled=S.en<=0;sb.textContent=S.en>0?"SELL ENERGY  +"+fmt(S.en*c.sell):"SELL ENERGY";
+ $("ot").textContent=objective();$("ox").style.display=S.tut<2?"":"none";$("snd").textContent=S.o.snd&&audioOn?"♪":"✕";for(const r of rows)if(r.t===tab||r.k==="ext")r.f()}
+function modal(title,lines,btns){const m=$("modal");if(!title){m.classList.remove("on");return}const b=$("mb");b.innerHTML="";const h=document.createElement("h2");h.textContent=title;b.appendChild(h);
+ for(const l of lines||[]){const p=document.createElement("p");p.textContent=l;b.appendChild(p)}for(const[t,f,pri]of btns||[]){const e=document.createElement("button");e.textContent=t;if(pri)e.className="pri";e.onclick=f;b.appendChild(e)}m.classList.add("on")}
+function settings(){const again=()=>settings();modal("Settings",[],[["Sound: "+(S.o.snd?"ON":"OFF"),()=>{S.o.snd=!S.o.snd;queue();refresh();again()}],["Visual effects: "+(S.o.fx?"ON":"OFF"),()=>{S.o.fx=!S.o.fx;queue();again()}],["Graphics quality: "+(S.o.quality||"high").toUpperCase(),()=>{const opts=["low","medium","high"];S.o.quality=opts[(opts.indexOf(S.o.quality||"high")+1)%3];engine?.setQuality(S.o.quality);queue();again()}],["Reset 3D camera",()=>{engine?.resetCamera();modal();toast("Camera reset") }],
+ ["Reset ALL progress",()=>modal("Reset everything?",["This permanently deletes your empire."],[["Yes, reset",()=>{const o=S.o;S=fresh();S.o=o;S.tut=0;initOps();save();refresh();modal()}],["Cancel",()=>modal()]])],["Close",()=>modal(),1]])}
+/* ---------- independent WebGL scene + fallback ---------- */
+const cv=$("c"),ctx=cv.getContext("2d"),G={cx:0,cy:0,a:40};
+let W=0,H=0,dpr=1,engine=null;
+function resize(){W=innerWidth;H=innerHeight;dpr=Math.min(devicePixelRatio||1,2);cv.width=W*dpr;cv.height=H*dpr;if(engine)engine.resize()}
+function geo(){const land=W>=H,side=land?$("panel").offsetWidth:0,bottom=land?0:$("panel").offsetHeight,top=$("hud").offsetHeight;G.cx=(W-side)*.5;G.cy=top+(H-top-bottom)*.5;G.a=Math.min(70,Math.max(24,(W-side)/9))}
+const P=(x,y)=>[G.cx+(x-y)*G.a,G.cy+(x+y)*G.a*.5];
+function draw(t){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);if(engine){try{engine.render(t)}catch(e){console.error('3D renderer',e);engine=null;$("world3d").style.display="none";cv.style.pointerEvents="auto";cv.style.background="radial-gradient(ellipse at center,#1a2871,#070b1c)";toast("3D rendering unavailable on this device","bad")}}
+ for(const p of ps){ctx.globalAlpha=Math.max(0,p.l);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,7);ctx.fill()}ctx.globalAlpha=1;ctx.textAlign="center";ctx.font="900 20px system-ui";
+ for(const f of fl){ctx.globalAlpha=Math.max(0,1-f.t);ctx.fillStyle=f.c;ctx.strokeStyle="#031126";ctx.lineWidth=4;ctx.strokeText(f.s,f.x,f.y-f.t*65);ctx.fillText(f.s,f.x,f.y-f.t*65)}ctx.globalAlpha=1;
+ if(!engine){ // graceful 2D fallback with usable reactor
+ const x=G.cx,y=G.cy,r=G.a;ctx.save();ctx.translate(x,y);ctx.shadowColor="#35e0ff";ctx.shadowBlur=42;ctx.fillStyle="#133362";ctx.beginPath();ctx.ellipse(0,r*.8,r*2,r*.55,0,0,7);ctx.fill();ctx.fillStyle="#46dafa";ctx.beginPath();ctx.moveTo(0,-r*2.3);ctx.lineTo(r,-r*.6);ctx.lineTo(0,r*.5);ctx.lineTo(-r,-r*.6);ctx.closePath();ctx.fill();ctx.restore();}}
+function init3D(){const world=$("world3d");try{engine=initEmpire3D({canvas:world,overlay:cv,state:()=>S,data:B,onReactor:(x,y)=>tap(x,y),onBuilding:k=>{tab=0;[...$("tabs").children].forEach((b,i)=>b.classList.toggle("on",i===0));for(const r of rows)r.e.classList.toggle("h",r.t!==0);refresh();toast(B[k].n+" · Level "+S.b[k])}});if(engine){engine.setQuality(S.o.quality||'high');cv.style.pointerEvents='none';world.style.display='block';}else {world.style.display='none';cv.style.pointerEvents='auto'}}catch(e){console.warn('WebGL initialization failed',e);engine=null;world.style.display='none';cv.style.pointerEvents='auto'}}
+/* ---------- loop (single rAF, SDK/visibility pause) ---------- */
+let raf=0,last=0,uiT=0,paused=false;
+function loop(now){raf=requestAnimationFrame(loop);if(now-lastTapAt>1200&&combo){combo=0;}const dt=Math.min((now-last)/1000,.25);last=now;step(dt);
+ pulse=Math.max(0,pulse-dt*5);shake=Math.max(0,shake-dt*2);for(let i=fl.length-1;i>=0;i--){fl[i].t+=dt*1.2;if(fl[i].t>=1)fl.splice(i,1)}
+ for(let i=ps.length-1;i>=0;i--){const p=ps[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=160*dt;p.l-=dt*1.6;if(p.l<=0)ps.splice(i,1)}
+ uiT+=dt;if(uiT>=.125){uiT=0;checkAch();refresh();renderOps()}if(dirty&&now>=saveAt||now-lastSave>15000)save();geo();draw(now/1000);updateArena(now)}
+function start(){if(raf||paused&&false)return;last=performance.now();raf=requestAnimationFrame(loop)}
+function pause(){paused=true;if(raf){cancelAnimationFrame(raf);raf=0}save()}
+function resume(){paused=false;if(!raf){const t0=performance.now();last=t0;raf=requestAnimationFrame(loop)}}
+/* ---------- boot ---------- */
+cv.addEventListener("pointerdown",e=>{if(engine)return;e.preventDefault();tap(e.clientX,e.clientY)});
+addEventListener("resize",resize);
+async function boot(){resize();build();refresh();if(YT&&ytgame.game&&typeof ytgame.game.firstFrameReady==="function")ytgame.game.firstFrameReady();
+ await load();init3D();initOps();
+ if(YT&&ytgame.system){try{if(typeof ytgame.system.isAudioEnabled==="function")audioOn=!!ytgame.system.isAudioEnabled();if(typeof ytgame.system.onAudioEnabledChange==="function")ytgame.system.onAudioEnabledChange(v=>{audioOn=!!v;refresh()});ytgame.system.onPause(pause);ytgame.system.onResume(resume)}catch(e){}}
+ else document.addEventListener("visibilitychange",()=>document.hidden?pause():resume());
+ refresh();$("load").remove();start();
+ if(S.tut===0){S.tut=1;queue();modal("YOUR DYNASTY BEGINS",["Tap the 3D reactor, sell energy, and assemble your first machines.","NEW: Every few moments an energy RIFT opens. Catch six moving shards for big rewards and temporary 2× power. Complete rotating field contracts to grow faster."],[["Start",()=>modal(),1]])}else if(offlineMsg)toast(offlineMsg,"gold");
+ if(YT&&ytgame.game&&typeof ytgame.game.gameReady==="function")ytgame.game.gameReady()}
+window.__IE={useBoost,claimQuest,QUEST,get S(){return S},set S(v){S=v},calc,tap,sell,buyB,buyU,buyX,ascend,step,merge,save,gain,fresh,load,startRift,claimContract,finishRift,setCan(v){canSave=v},cost,B,UP,fmt,start,pause,resume,get raf(){return raf}};
+boot();
+})();
+</script></body></html>
